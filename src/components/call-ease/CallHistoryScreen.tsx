@@ -1,6 +1,7 @@
 "use client";
 
 import type { FC } from 'react';
+import { useState, useEffect } from 'react';
 import type { CallLog } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,16 @@ const CallTypeIcon = ({ type }: { type: CallLog['type'] }) => {
     default:
       return null;
   }
+};
+
+const TimeAgo: FC<{ date: Date }> = ({ date }) => {
+  const [timeAgo, setTimeAgo] = useState('');
+
+  useEffect(() => {
+    setTimeAgo(formatDistanceToNow(date, { addSuffix: true }));
+  }, [date]);
+
+  return <>{timeAgo}</>;
 };
 
 const CallHistoryScreen: FC<CallHistoryScreenProps> = ({ callHistory, onCall }) => {
@@ -51,7 +62,7 @@ const CallHistoryScreen: FC<CallHistoryScreenProps> = ({ callHistory, onCall }) 
               </div>
               <div className="flex items-center">
                 <p className="text-xs text-muted-foreground mr-4">
-                  {formatDistanceToNow(log.timestamp, { addSuffix: true })}
+                  <TimeAgo date={log.timestamp} />
                 </p>
                 <Button variant="ghost" size="icon" onClick={() => onCall(log.contact.number)}>
                   <Phone className="h-5 w-5 text-primary" />

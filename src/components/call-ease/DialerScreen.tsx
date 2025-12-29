@@ -1,6 +1,7 @@
 "use client";
 
 import type { FC } from 'react';
+import { useState, useEffect } from 'react';
 import type { Contact, CallLog } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Phone, Delete, ArrowUpRight, ArrowDownLeft, PhoneMissed, Plus } from 'lucide-react';
@@ -34,6 +35,16 @@ const CallTypeIcon = ({ type }: { type: CallLog['type'] }) => {
     default:
       return null;
   }
+};
+
+const TimeAgo: FC<{ date: Date }> = ({ date }) => {
+  const [timeAgo, setTimeAgo] = useState('');
+
+  useEffect(() => {
+    setTimeAgo(formatDistanceToNow(date, { addSuffix: true }));
+  }, [date]);
+
+  return <>{timeAgo}</>;
 };
 
 const DialerScreen: FC<DialerScreenProps> = ({ currentNumber, setCurrentNumber, onCall, contacts, callHistory }) => {
@@ -117,7 +128,7 @@ const DialerScreen: FC<DialerScreenProps> = ({ currentNumber, setCurrentNumber, 
                                 </div>
                                 <div className="flex flex-col items-end gap-1">
                                     <p className="text-xs text-muted-foreground text-right">
-                                        {formatDistanceToNow(log.timestamp, { addSuffix: true })}
+                                        <TimeAgo date={log.timestamp} />
                                     </p>
                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); onCall(log.contact.number, log.contact);}}>
                                         <Phone className="h-4 w-4 text-primary" />
