@@ -1,7 +1,7 @@
 "use client";
 
 import type { FC } from 'react';
-import { Users, History, Grid3x3, Ban } from 'lucide-react';
+import { Users, History, Grid3x3, Ban, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ActiveTab } from '@/lib/types';
 
@@ -15,6 +15,7 @@ const navItems: { tab: ActiveTab; icon: React.ElementType; label: string }[] = [
   { tab: 'history', icon: History, label: 'Recents' },
   { tab: 'dialer', icon: Grid3x3, label: 'Dialer' },
   { tab: 'blocked', icon: Ban, label: 'Blocked' },
+  { tab: 'settings', icon: Settings, label: 'Settings' },
 ];
 
 const BottomNav: FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {

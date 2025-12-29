@@ -12,6 +12,7 @@ import DialerScreen from "./DialerScreen";
 import CallHistoryScreen from "./CallHistoryScreen";
 import ContactsScreen from "./ContactsScreen";
 import BlockedNumbersScreen from "./BlockedNumbersScreen";
+import SettingsScreen from "./SettingsScreen";
 import { useToast } from "@/hooks/use-toast";
 
 export default function MainAppUI() {
@@ -123,6 +124,8 @@ export default function MainAppUI() {
         }} />;
       case "blocked":
         return <BlockedNumbersScreen blockedNumbers={blockedNumbers} setBlockedNumbers={setBlockedNumbers} />;
+      case "settings":
+        return <SettingsScreen />;
       case "dialer":
       default:
         return <DialerScreen currentNumber={currentNumber} setCurrentNumber={setCurrentNumber} onCall={handleStartCall} />;
@@ -130,7 +133,7 @@ export default function MainAppUI() {
   };
 
   return (
-    <div className="relative w-full h-full sm:max-w-sm sm:h-[85vh] sm:max-h-[720px] bg-card sm:rounded-3xl sm:shadow-2xl overflow-hidden sm:border-4 sm:border-primary/10 flex flex-col">
+    <div className="relative w-full h-full sm:max-w-sm sm:h-svh sm:max-h-[800px] bg-card sm:rounded-3xl sm:shadow-2xl overflow-hidden sm:border-4 sm:border-primary/10 flex flex-col">
       <AnimatePresence>
         {callState === "ringing" && callerInfo && (
           <motion.div

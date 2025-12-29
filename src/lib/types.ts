@@ -21,5 +21,5 @@ export type BlockedNumber = {
     name?: string;
 };
 
-export type ActiveTab = 'contacts' | 'history' | 'dialer' | 'blocked';
+export type ActiveTab = 'contacts' | 'history' | 'dialer' | 'blocked' | 'settings';
 export type CallState = 'idle' | 'dialing' | 'ringing' | 'active' | 'ended';
