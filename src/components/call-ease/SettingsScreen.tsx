@@ -1,16 +1,76 @@
 "use client";
 
-import type { FC } from 'react';
+import type { FC, ChangeEvent } from 'react';
+import { useRef } from 'react';
 import { useTheme } from "next-themes";
-import { Moon, Sun, Bell, Phone, Info } from 'lucide-react';
+import { Moon, Sun, Bell, Phone, Info, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import type { Contact } from '@/lib/types';
+import { useToast } from "@/hooks/use-toast";
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-const SettingsScreen: FC = () => {
+interface SettingsScreenProps {
+    setContacts: React.Dispatch<React.SetStateAction<Contact[]>>;
+}
+
+const SettingsScreen: FC<SettingsScreenProps> = ({ setContacts }) => {
     const { theme, setTheme } = useTheme();
+    const { toast } = useToast();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target?.result;
+            if (typeof text === 'string') {
+                try {
+                    const lines = text.split('\n').filter(line => line.trim() !== '');
+                    const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+                    const nameIndex = header.indexOf('name');
+                    const numberIndex = header.indexOf('number');
+
+                    if (nameIndex === -1 || numberIndex === -1) {
+                        throw new Error('CSV must have "name" and "number" columns.');
+                    }
+
+                    const newContacts: Contact[] = lines.slice(1).map((line, index) => {
+                        const data = line.split(',');
+                        return {
+                            id: `imported-${Date.now()}-${index}`,
+                            name: data[nameIndex].trim(),
+                            number: data[numberIndex].trim(),
+                            avatar: PlaceHolderImages[5] // Default avatar
+                        };
+                    });
+                    
+                    setContacts(prev => [...prev, ...newContacts]);
+                    toast({
+                        title: "Import Successful",
+                        description: `${newContacts.length} contacts have been added.`,
+                    });
+                } catch (error: any) {
+                     toast({
+                        title: "Import Failed",
+                        description: error.message || "Could not parse the CSV file. Please check the format.",
+                        variant: "destructive",
+                    });
+                }
+            }
+        };
+        reader.readAsText(file);
+    };
+
 
     return (
         <div className="flex flex-col h-full bg-muted/30">
@@ -34,6 +94,29 @@ const SettingsScreen: FC = () => {
                                 onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
                             />
                         </div>
+                    </CardContent>
+                </Card>
+
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg">Contacts</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="import-contacts" className="flex items-center gap-3">
+                                <Upload className="h-5 w-5 text-muted-foreground" />
+                                <span>Import Contacts</span>
+                            </Label>
+                             <Button id="import-contacts" onClick={handleImportClick}>Import from CSV</Button>
+                             <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden"
+                                accept=".csv"
+                            />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">Import contacts from a CSV file. The file must contain 'name' and 'number' columns.</p>
                     </CardContent>
                 </Card>
 

@@ -21,7 +21,7 @@ export default function MainAppUI() {
   const [currentNumber, setCurrentNumber] = useState("");
   const [callerInfo, setCallerInfo] = useState<Pick<Contact, 'name' | 'number' | 'avatar'> | null>(null);
   const [callHistory, setCallHistory] = useState<CallLog[]>(mockCallHistory);
-  const [contacts] = useState<Contact[]>(mockContacts);
+  const [contacts, setContacts] = useState<Contact[]>(mockContacts);
   const [blockedNumbers, setBlockedNumbers] = useState<BlockedNumber[]>(mockBlockedNumbers);
   const { toast } = useToast();
 
@@ -125,7 +125,7 @@ export default function MainAppUI() {
       case "blocked":
         return <BlockedNumbersScreen blockedNumbers={blockedNumbers} setBlockedNumbers={setBlockedNumbers} />;
       case "settings":
-        return <SettingsScreen />;
+        return <SettingsScreen setContacts={setContacts} />;
       case "dialer":
       default:
         return <DialerScreen currentNumber={currentNumber} setCurrentNumber={setCurrentNumber} onCall={handleStartCall} />;
