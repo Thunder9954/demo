@@ -3,7 +3,7 @@
 import type { FC } from 'react';
 import type { Contact, CallLog } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Phone, Delete, ArrowUpRight, ArrowDownLeft, PhoneMissed } from 'lucide-react';
+import { Phone, Delete, ArrowUpRight, ArrowDownLeft, PhoneMissed, Plus } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
@@ -36,7 +36,6 @@ const CallTypeIcon = ({ type }: { type: CallLog['type'] }) => {
   }
 };
 
-
 const DialerScreen: FC<DialerScreenProps> = ({ currentNumber, setCurrentNumber, onCall, contacts, callHistory }) => {
   const handleKeyPress = (key: string) => {
     setCurrentNumber(currentNumber + key);
@@ -45,85 +44,110 @@ const DialerScreen: FC<DialerScreenProps> = ({ currentNumber, setCurrentNumber, 
   const handleBackspace = () => {
     setCurrentNumber(currentNumber.slice(0, -1));
   };
+
+  const handleClear = () => {
+    setCurrentNumber('');
+  };
+
+  const handleRecentCallClick = (number: string) => {
+    setCurrentNumber(number);
+  };
   
   const favoriteContacts = contacts.filter(c => c.isFavorite);
-  const recentCalls = callHistory.slice(0, 10);
-  const matchingContact = currentNumber ? contacts.find(c => c.number.replace(/\D/g, '').includes(currentNumber)) : null;
+  const recentCalls = callHistory.slice(0, 15);
+  const matchingContact = currentNumber ? contacts.find(c => c.number.replace(/\D/g, '').includes(currentNumber.replace(/\D/g, ''))) : null;
 
   return (
-    <div className="flex flex-col h-full">
-        <div className="flex-grow flex flex-col p-4">
-            <div className="relative w-full text-center h-16 mb-2">
-                <p className="text-4xl font-headline tracking-wider h-12 truncate">{currentNumber}</p>
-                {currentNumber.length > 0 && (
-                    <div className="flex items-center justify-center">
-                        <span className="text-sm text-muted-foreground">{matchingContact ? matchingContact.name : 'Add to contacts'}</span>
-                        <Button variant="ghost" size="icon" className="absolute right-0 top-1/2 -translate-y-1/2" onClick={handleBackspace}>
-                            <Delete className="h-6 w-6" />
-                        </Button>
+    <div className="flex flex-col h-full bg-card">
+        {/* Number Display */}
+        <div className="flex flex-col justify-end h-28 p-4">
+            <div className="relative text-center">
+                <p className="text-4xl font-headline tracking-wider h-12 truncate text-foreground">{currentNumber}</p>
+                 {currentNumber.length > 0 && (
+                    <div className="flex items-center justify-center text-sm h-5">
+                        <span className="text-muted-foreground">{matchingContact ? matchingContact.name : 'Add to contacts'}</span>
                     </div>
                 )}
             </div>
+        </div>
 
-            <ScrollArea className="flex-grow">
-                 {currentNumber.length === 0 && (
-                    <>
-                        {favoriteContacts.length > 0 && (
-                            <div className="flex justify-center gap-4 py-2">
+        {/* Favorites and Recents */}
+        <ScrollArea className="flex-grow">
+             {currentNumber.length === 0 ? (
+                <>
+                    {favoriteContacts.length > 0 && (
+                        <div>
+                            <p className="text-xs font-semibold uppercase text-muted-foreground px-4 mt-2">Favorites</p>
+                            <div className="grid grid-cols-4 gap-4 p-4">
                                 {favoriteContacts.map(contact => (
                                     <div key={contact.id} className="flex flex-col items-center gap-1 cursor-pointer" onClick={() => onCall(contact.number, contact)}>
-                                        <Avatar className="h-12 w-12">
+                                        <Avatar className="h-14 w-14 border-2 border-primary/20">
                                             <AvatarImage src={contact.avatar.imageUrl} alt={contact.name} data-ai-hint={contact.avatar.imageHint} />
-                                            <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
+                                            <AvatarFallback className="text-xl">{contact.name.charAt(0)}</AvatarFallback>
                                         </Avatar>
-                                        <span className="text-xs text-muted-foreground truncate w-14 text-center">{contact.name}</span>
+                                        <span className="text-xs text-foreground truncate w-16 text-center">{contact.name}</span>
                                     </div>
                                 ))}
-                            </div>
-                        )}
-                        <div className="px-2 divide-y mt-2">
-                            {recentCalls.map((log) => (
-                                <div key={log.id} className="flex items-center p-2 rounded-lg hover:bg-muted/50" onClick={() => onCall(log.contact.number, log.contact)}>
-                                    <Avatar className="h-10 w-10">
-                                        <AvatarImage src={log.contact.avatar.imageUrl} alt={log.contact.name} data-ai-hint={log.contact.avatar.imageHint} />
-                                        <AvatarFallback>{log.contact.name.charAt(0)}</AvatarFallback>
+                                 <div className="flex flex-col items-center gap-1 cursor-pointer">
+                                    <Avatar className="h-14 w-14 border-2 border-dashed border-muted-foreground/50 flex items-center justify-center bg-muted/30">
+                                        <Plus className="h-6 w-6 text-muted-foreground"/>
                                     </Avatar>
-                                    <div className="ml-4 flex-grow">
-                                        <p className={`font-semibold ${log.type === 'missed' ? 'text-red-500' : 'text-foreground'}`}>
-                                            {log.contact.name}
-                                        </p>
-                                        <div className="flex items-center text-sm text-muted-foreground">
-                                            <CallTypeIcon type={log.type} />
-                                            <span className="ml-1">{log.contact.number}</span>
-                                        </div>
+                                    <span className="text-xs text-muted-foreground truncate w-16 text-center">Add New</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <p className="text-xs font-semibold uppercase text-muted-foreground px-4 mt-2">Recents</p>
+                    <div className="px-2 divide-y divide-border">
+                        {recentCalls.map((log) => (
+                            <div key={log.id} className="flex items-center p-2 rounded-lg hover:bg-muted/50 cursor-pointer" onClick={() => handleRecentCallClick(log.contact.number)}>
+                                <Avatar className="h-10 w-10">
+                                    <AvatarImage src={log.contact.avatar.imageUrl} alt={log.contact.name} data-ai-hint={log.contact.avatar.imageHint} />
+                                    <AvatarFallback>{log.contact.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="ml-4 flex-grow">
+                                    <p className={`font-semibold ${log.type === 'missed' ? 'text-red-500' : 'text-foreground'}`}>
+                                        {log.contact.name}
+                                    </p>
+                                    <div className="flex items-center text-sm text-muted-foreground">
+                                        <CallTypeIcon type={log.type} />
+                                        <span className="ml-1">{log.contact.number}</span>
                                     </div>
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
                                     <p className="text-xs text-muted-foreground text-right">
                                         {formatDistanceToNow(log.timestamp, { addSuffix: true })}
                                     </p>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); onCall(log.contact.number, log.contact);}}>
+                                        <Phone className="h-4 w-4 text-primary" />
+                                    </Button>
                                 </div>
-                            ))}
-                        </div>
-                    </>
-                 )}
-            </ScrollArea>
-        </div>
+                            </div>
+                        ))}
+                    </div>
+                </>
+             ) : null}
+        </ScrollArea>
         
-        <div className="mt-auto pb-4">
-            <div className="grid grid-cols-3 gap-2 px-6">
+        {/* Dial Pad */}
+        <div className="mt-auto pt-2 pb-4 bg-card">
+            <div className="grid grid-cols-3 gap-y-2 gap-x-4 px-8">
                 {dialPadKeys.map(({ main, sub }) => (
                 <Button
                     key={main}
                     variant="ghost"
-                    className="h-16 rounded-2xl text-3xl font-light flex flex-col bg-muted/50"
+                    className="h-16 rounded-full text-3xl font-light flex flex-col bg-muted/30 hover:bg-muted"
                     onClick={() => handleKeyPress(main)}
                 >
                     <span>{main}</span>
-                    {sub && <span className="text-xs font-normal tracking-widest">{sub}</span>}
+                    {sub && <span className="text-[10px] font-normal tracking-widest text-muted-foreground">{sub}</span>}
                 </Button>
                 ))}
             </div>
 
-            <div className="flex justify-center items-center p-4">
+            <div className="flex justify-evenly items-center px-4 pt-4">
+                 <div className="w-16 h-16"></div>
                 <Button
                     size="lg"
                     className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 shadow-lg"
@@ -131,6 +155,9 @@ const DialerScreen: FC<DialerScreenProps> = ({ currentNumber, setCurrentNumber, 
                     disabled={!currentNumber}
                 >
                     <Phone className="h-7 w-7 text-white" />
+                </Button>
+                <Button variant="ghost" size="icon" className="w-16 h-16" onClick={handleBackspace} disabled={!currentNumber}>
+                    <Delete className="h-6 w-6 text-muted-foreground" />
                 </Button>
             </div>
         </div>
