@@ -119,7 +119,7 @@ export default function MainAppUI() {
       case "contacts":
         return <ContactsScreen contacts={contacts} onCall={(contact) => {
           setCurrentNumber(contact.number);
-          setActiveTab('dialer');
+          handleStartCall(contact.number, contact);
         }} />;
       case "blocked":
         return <BlockedNumbersScreen blockedNumbers={blockedNumbers} setBlockedNumbers={setBlockedNumbers} />;
@@ -130,7 +130,7 @@ export default function MainAppUI() {
   };
 
   return (
-    <div className="relative w-full max-w-sm h-[85vh] max-h-[720px] bg-card rounded-3xl shadow-2xl overflow-hidden border-4 border-primary/10 flex flex-col">
+    <div className="relative w-full h-full sm:max-w-sm sm:h-[85vh] sm:max-h-[720px] bg-card sm:rounded-3xl sm:shadow-2xl overflow-hidden sm:border-4 sm:border-primary/10 flex flex-col">
       <AnimatePresence>
         {callState === "ringing" && callerInfo && (
           <motion.div

@@ -40,7 +40,7 @@ const ContactsScreen: FC<ContactsScreenProps> = ({ contacts, onCall }) => {
       <ScrollArea className="flex-grow">
         <div className="p-2">
           {filteredContacts.map((contact) => (
-            <div key={contact.id} className="flex items-center p-2 rounded-lg hover:bg-muted/50">
+            <div key={contact.id} className="flex items-center p-2 rounded-lg hover:bg-muted/50" onClick={() => onCall(contact)}>
               <Avatar className="h-10 w-10">
                 <AvatarImage src={contact.avatar.imageUrl} alt={contact.name} data-ai-hint={contact.avatar.imageHint}/>
                 <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
@@ -49,7 +49,7 @@ const ContactsScreen: FC<ContactsScreenProps> = ({ contacts, onCall }) => {
                 <p className="font-semibold text-foreground">{contact.name}</p>
                 <p className="text-sm text-muted-foreground">{contact.number}</p>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => onCall(contact)}>
+              <Button variant="ghost" size="icon">
                 <Phone className="h-5 w-5 text-primary" />
               </Button>
             </div>
