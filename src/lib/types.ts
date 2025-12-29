@@ -5,6 +5,7 @@ export type Contact = {
   name: string;
   number: string;
   avatar: ImagePlaceholder;
+  isFavorite?: boolean;
 };
 
 export type CallLog = {

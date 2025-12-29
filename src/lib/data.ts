@@ -4,12 +4,12 @@ import type { Contact, CallLog, BlockedNumber } from './types';
 const avatars = PlaceHolderImages;
 
 export const mockContacts: Contact[] = [
-  { id: '1', name: 'Ava', number: '555-0101', avatar: avatars[0] },
-  { id: '2', name: 'Liam', number: '555-0102', avatar: avatars[1] },
-  { id: '3', name: 'Olivia', number: '555-0103', avatar: avatars[2] },
-  { id: '4', name: 'Noah', number: '555-0104', avatar: avatars[3] },
-  { id: '5', name: 'Emma', number: '555-0105', avatar: avatars[4] },
-  { id: '6', name: 'Work', number: '555-0199', avatar: avatars[5] },
+  { id: '1', name: 'Ava', number: '555-0101', avatar: avatars[0], isFavorite: true },
+  { id: '2', name: 'Liam', number: '555-0102', avatar: avatars[1], isFavorite: true },
+  { id: '3', name: 'Olivia', number: '555-0103', avatar: avatars[2], isFavorite: false },
+  { id: '4', name: 'Noah', number: '555-0104', avatar: avatars[3], isFavorite: true },
+  { id: '5', name: 'Emma', number: '555-0105', avatar: avatars[4], isFavorite: false },
+  { id: '6', name: 'Work', number: '555-0199', avatar: avatars[5], isFavorite: false },
 ];
 
 export const mockCallHistory: CallLog[] = [

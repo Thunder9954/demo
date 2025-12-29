@@ -6,15 +6,16 @@ import type { Contact } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Phone, Search } from 'lucide-react';
+import { Phone, Search, Star } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ContactsScreenProps {
   contacts: Contact[];
   onCall: (contact: Contact) => void;
+  toggleFavorite: (contactId: string) => void;
 }
 
-const ContactsScreen: FC<ContactsScreenProps> = ({ contacts, onCall }) => {
+const ContactsScreen: FC<ContactsScreenProps> = ({ contacts, onCall, toggleFavorite }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredContacts = contacts.filter(contact =>
@@ -40,7 +41,7 @@ const ContactsScreen: FC<ContactsScreenProps> = ({ contacts, onCall }) => {
       <ScrollArea className="flex-grow">
         <div className="p-2">
           {filteredContacts.map((contact) => (
-            <div key={contact.id} className="flex items-center p-2 rounded-lg hover:bg-muted/50">
+            <div key={contact.id} className="flex items-center p-2 rounded-lg hover:bg-muted/50 group">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={contact.avatar.imageUrl} alt={contact.name} data-ai-hint={contact.avatar.imageHint}/>
                 <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
@@ -49,6 +50,9 @@ const ContactsScreen: FC<ContactsScreenProps> = ({ contacts, onCall }) => {
                 <p className="font-semibold text-foreground">{contact.name}</p>
                 <p className="text-sm text-muted-foreground">{contact.number}</p>
               </div>
+              <Button variant="ghost" size="icon" onClick={() => toggleFavorite(contact.id)}>
+                <Star className={`h-5 w-5 text-muted-foreground group-hover:text-amber-400 transition-colors ${contact.isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
+              </Button>
               <Button variant="ghost" size="icon" onClick={() => onCall(contact)}>
                 <Phone className="h-5 w-5 text-primary" />
               </Button>

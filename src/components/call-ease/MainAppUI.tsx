@@ -101,6 +101,14 @@ export default function MainAppUI() {
     setCallerInfo(null);
   }, [callerInfo]);
 
+    const toggleFavorite = (contactId: string) => {
+        setContacts(prevContacts =>
+            prevContacts.map(c =>
+                c.id === contactId ? { ...c, isFavorite: !c.isFavorite } : c
+            )
+        );
+    };
+
   useEffect(() => {
     // Simulate an incoming call for demonstration
     const timer = setTimeout(() => {
@@ -121,14 +129,22 @@ export default function MainAppUI() {
         return <ContactsScreen contacts={contacts} onCall={(contact) => {
           setCurrentNumber(contact.number);
           handleStartCall(contact.number, contact);
-        }} />;
+        }} 
+        toggleFavorite={toggleFavorite}
+        />;
       case "blocked":
         return <BlockedNumbersScreen blockedNumbers={blockedNumbers} setBlockedNumbers={setBlockedNumbers} />;
       case "settings":
         return <SettingsScreen setContacts={setContacts} />;
       case "dialer":
       default:
-        return <DialerScreen currentNumber={currentNumber} setCurrentNumber={setCurrentNumber} onCall={handleStartCall} />;
+        return <DialerScreen 
+                    currentNumber={currentNumber} 
+                    setCurrentNumber={setCurrentNumber} 
+                    onCall={handleStartCall} 
+                    contacts={contacts}
+                    callHistory={callHistory}
+                />;
     }
   };
 
